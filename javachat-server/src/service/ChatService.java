@@ -178,10 +178,9 @@ public class ChatService {
             throw new ChatRoomExistException(chatRoomName);
         }
     }
-    public void initChatRooms() {
-        List<ChatRoom> rooms = chatDao.findAllChatRoomsExceptLobby();
-        rooms.forEach(chatDao::addChatRoom);
-        System.out.println("로비 제외 채팅방 초기화 완료: " + rooms.size() + "개 로드됨");
+    public void loadChatRoomsFromDb() {
+        chatDao.refreshChatRoomsFromDb();
+        System.out.println("로비 제외 채팅방 메모리 로드 완료: " + chatDao.getChatRooms().size() + "개");
     }
     // 채팅방 나가기
     public User exitChatRoom(String chatRoomName, String userId) throws UserNotFoundException, ChatRoomNotFoundException {

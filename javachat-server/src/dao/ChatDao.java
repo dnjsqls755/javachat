@@ -103,5 +103,11 @@ public class ChatDao {
     public Connection getConnection() {
         return connection;
     }
+
+    public void refreshChatRoomsFromDb() {
+        List<ChatRoom> rooms = findAllChatRoomsExceptLobby();
+        chatRooms.clear();
+        chatRooms.addAll(rooms);
+    }
 }
 
