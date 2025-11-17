@@ -109,6 +109,20 @@ public class ServerThread extends Thread {
             sendMessage(new UserListResponse(ChatDao.LOBBY_CHAT_NAME, chatService.getUsers()));
             break;
 
+        case MESSAGE:
+            MessageResponse chatMessage = new MessageResponse(message);
+
+            if (chatMessage.getMessageType() == MessageType.CHAT) {
+                chatService.saveChatMessage(
+                        chatMessage.getChatRoomName(),
+                        chatMessage.getUserName(),
+                        chatMessage.getMessage()
+                );
+            }
+
+            sendMessage(chatMessage);
+            break;
+
         case ID_CHECK:
             boolean isDuplicate = chatService.isUserIdDuplicate(message.trim());
             sendResponse(isDuplicate ? "ID_DUPLICATE" : "ID_OK");
