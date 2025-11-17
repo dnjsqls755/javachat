@@ -96,6 +96,12 @@ public class ChatDao {
         return users.stream().filter(user -> user.getId().equals(userId)).findAny();
     }
 
+    public Optional<User> findUserByNickname(String nickname) {
+        return users.stream()
+                .filter(user -> user.getNickName().equals(nickname))
+                .findAny();
+    }
+
     public List<ChatRoom> getChatRooms() {
         return chatRooms;
     }
@@ -108,6 +114,19 @@ public class ChatDao {
         List<ChatRoom> rooms = findAllChatRoomsExceptLobby();
         chatRooms.clear();
         chatRooms.addAll(rooms);
+    }
+
+    public void saveMessage(String chatRoomName, String senderId, String content) {
+        String sql = "INSERT INTO Messages (message_id, room_id, sender_id, content) " +
+                "VALUES (messages_seq.NEXTVAL, (SELECT room_id FROM ChatRooms WHERE room_name = ?), ?, ?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, chatRoomName);
+            pstmt.setString(2, senderId);
+            pstmt.setString(3, content);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
 

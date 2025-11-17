@@ -222,6 +222,15 @@ public class ChatService {
         return findUser.get();
     }
 
+    public void saveChatMessage(String chatRoomName, String userNickname, String content) {
+        Optional<User> sender = chatDao.findUserByNickname(userNickname);
+        if (sender.isEmpty()) {
+            System.out.println("닉네임 [" + userNickname + "] 사용자를 찾을 수 없어 메시지를 저장하지 못했습니다.");
+            return;
+        }
+        chatDao.saveMessage(chatRoomName, sender.get().getId(), content);
+    }
+
     public ChatRoom getChatRoom(String chatRoomName) {
         if (chatRoomName.equals(ChatDao.LOBBY_CHAT_NAME)) {
             return chatDao.getLobby();
