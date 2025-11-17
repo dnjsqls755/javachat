@@ -467,8 +467,12 @@ try (
                             
                      
                           // Java 쪽 브릿지로 전송
-                          if (window.app && typeof window.app.setAddress === 'function') {
-                            window.app.setAddress(zonecode, roadAddr, jibunAddr);
+                          if (window.app && window.app.setAddress) {
+                            try {
+                              window.app.setAddress(zonecode, roadAddr, jibunAddr);
+                            } catch (e) {
+                              console.error('주소 전달 실패', e);
+                            }
                           }
                         },
                         width: '100%',
