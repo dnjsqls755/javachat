@@ -438,21 +438,7 @@ try (
                 if (state == Worker.State.SUCCEEDED) {
                     // window.app.setAddress(...) 로 Java 메서드 호출 가능하게 설정
                     JSObject window = (JSObject) webEngine.executeScript("window");
-                    window.setMember("app", new Object() {
-                        // JS에서 선택된 주소를 넘겨주면 Swing 필드에 세팅
-                        public void setAddress(String zonecode, String roadAddr, String jibunAddr) {
-                            SwingUtilities.invokeLater(() -> {
-                                postalField.setText(zonecode != null ? zonecode : "");
-                                String addr = (roadAddr != null && !roadAddr.isEmpty())
-                                        ? roadAddr
-                                        : (jibunAddr != null ? jibunAddr : "");
-                                System.out.println("test : " + addr);
-                                addressField.setText(addr);
-                                detailAddressField.requestFocus(); // 상세주소는 사용자가 이어서 입력
-                                dialog.dispose(); // 선택 완료 후 다이얼로그 닫기
-                            });
-                        }
-                    });
+                    window.setMember("app", new PostcodeBridge(dialog));
                 }
             });
 
@@ -499,6 +485,28 @@ try (
         });
 
         dialog.setVisible(true);
+    }
+
+    private void applyPostcodeSelection(String zonecode, String roadAddr, String jibunAddr, JDialog dialog) {
+        postalField.setText(zonecode != null ? zonecode : "");
+        String addr = (roadAddr != null && !roadAddr.isEmpty())
+                ? roadAddr
+                : (jibunAddr != null ? jibunAddr : "");
+        addressField.setText(addr);
+        detailAddressField.requestFocus();
+        dialog.dispose();
+    }
+
+    public class PostcodeBridge {
+        private final JDialog dialog;
+
+        public PostcodeBridge(JDialog dialog) {
+            this.dialog = dialog;
+        }
+
+        public void setAddress(String zonecode, String roadAddr, String jibunAddr) {
+            SwingUtilities.invokeLater(() -> applyPostcodeSelection(zonecode, roadAddr, jibunAddr, dialog));
+        }
     }
 
     // ===== 폼 검증 =====
